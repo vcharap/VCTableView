@@ -1,0 +1,7 @@
+VCTableView
+
+A subclass of UITableView that allows the reordering of rows without having to be in "edit" mode with that stupid reorder control view messin up yo cells. Just pass YES to setReordering: Currently, the table view does not honor 'tableView:CanMoreRowAtIndexPath:'
+
+Possible additions later: honor tableView:canMoveRowAtIndexPath: Add scrolling of table view when a cell is being moved off screen.
+
+NOTE: VCTableView intercepts methods sent to UITableViewDelegate. Currently only some of UITableViewDelegate methods are passed from VCTableView to the ACTUAL delegeta (you know, one of your objects). If you are not getting a delegate callback, its because you need to impliment it in VCTableView, and have it be passed to your object.
