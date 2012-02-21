@@ -35,6 +35,8 @@ typedef enum {
     
     id <UITableViewDataSource> _theRealDataSource;
     id <UITableViewDelegate> _theRealDelegate;
+    
+    BOOL _isTracking;
 }
 
 //
@@ -50,7 +52,7 @@ typedef enum {
 @property (nonatomic, retain) NSIndexPath *initialPath;
 
 @property (nonatomic, retain) UITableViewCell *emptyCell;
-
+@property (nonatomic, readonly) BOOL isTracking;
 //
 // Function turns on/off the ability to reorder rows
 //

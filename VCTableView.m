@@ -13,7 +13,7 @@
 @end
 
 @implementation VCTableView
-@synthesize longgr;
+@synthesize longgr, isTracking = _isTracking;
 @synthesize currentPath, initialPath, emptyCell = _emptyCell;
 
 -(id)initWithFrame:(CGRect)frame style:(UITableViewStyle)style
@@ -72,7 +72,7 @@
 
 -(IBAction)moveEmptyUp:(id)sender
 {
-    
+    DLog(@"");
     moveDirection = VCTableView_Move_Direction_Up;
     [self beginUpdates];
     
@@ -104,6 +104,7 @@
 
 -(IBAction)moveEmptyDown:(id)sender
 {
+    DLog(@"");
     moveDirection = VCTableView_Move_Direction_Down;
     [self beginUpdates];
 
@@ -128,9 +129,11 @@
     
     CGPoint touchPt = [self.longgr locationInView:self];
     NSIndexPath *hitPath = [self indexPathForRowAtPoint:touchPt];
-    
+    DLog(@"hit path: %@", hitPath);
+    DLog(@"current path: %@", self.currentPath);
     if(self.longgr.state == UIGestureRecognizerStateBegan){
         if(hitPath){
+            _isTracking = YES;
             //find cell for touch
             UITableViewCell *cell = [self cellForRowAtIndexPath:hitPath];
             
@@ -171,6 +174,8 @@
             cellImageView.frame = CGRectMake(cellImageView.frame.origin.x, touchPt.y - touchInCell_y, cellImageView.frame.size.width, cellImageView.frame.size.height);
             
             //switch cells
+            if(!hitPath) return;
+            
             if(self.currentPath.row > hitPath.row && ((touchPt.y - previousTouchPt.y) < 0)){
                 [self moveEmptyUp:self];
             }
@@ -187,11 +192,13 @@
                 cellImageView.frame = CGRectMake(cellImageView.frame.origin.x, touchPt.y, cellImageView.frame.size.width, cellImageView.frame.size.height);
                 
                 //switch cells
-                if(self.currentPath.row < hitPath.row){
-                    [self moveEmptyUp:self];
-                }
-                else if(self.currentPath.row > hitPath.row){
+                //DLog(@"hitPath row %d", hitPath.row);
+                if(hitPath && self.currentPath.row < hitPath.row){
                     [self moveEmptyDown:self];
+                }
+                else if(hitPath && self.currentPath.row > hitPath.row){
+                    DLog(@"current row %d is greater than hitPath row %d", self.currentPath.row, hitPath.row);
+                    [self moveEmptyUp:self];
                 }
                 
                 [indexPathsMap release];
@@ -210,6 +217,7 @@
                 self.currentPath = nil;
                 self.initialPath = nil;
                 touchInCell_y = 0.0;
+                _isTracking = NO;
                 
                 [self reloadData];
             }
@@ -234,6 +242,11 @@
 
 -(void)dealloc
 {
+    if(indexPathsMap){
+        [indexPathsMap release];
+        indexPathsMap = nil;
+    }
+    
     [cellImageView release];
     cellImageView = nil;
     
